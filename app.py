@@ -86,7 +86,7 @@ def calcular_superodd(odd_superodd, odd_cobertura, tipo_odd_superodd, tipo_odd_c
         else:
             aposta_cobertura = valor_apostado
             retorno = aposta_cobertura * odd_cobertura
-            aposta_superodd = (retorno / odd_superodd) if odd_superdd > 0 else 0
+            aposta_superodd = (retorno / odd_superodd) if odd_superodd > 0 else 0
         total_investido = aposta_superodd + aposta_cobertura
 
         lucro = retorno - total_investido
@@ -225,7 +225,7 @@ if selected == "Super Odd":
         with col_aposta_superodd:
             st.markdown(f"**Aposta Super Odd:** R$ {aposta_superodd:.2f}")
         with col_aposta_cobertura:
-            st.markdown(f"**Aposta Coertura:** R$ {aposta_cobertura:.2f}")
+            st.markdown(f"**Aposta Cobertura:** R$ {aposta_cobertura:.2f}")
         with col_retorno:
             st.markdown(f"**Retorno:** R$ {retorno:.2f}")
         st.write("##")
