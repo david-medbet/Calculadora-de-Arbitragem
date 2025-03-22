@@ -22,7 +22,7 @@ st.title("Calculadora de Arbitragem")
 # Tipo de estratégia
 with st.sidebar:
     selected = option_menu(menu_title="Menu de Arbitragem", 
-                           options=["Aumento", "Aumento com Lay", "Super Odd"])
+                           options=["Aumento", "Super Odd"])
     
 # Cálculo de aumento
 def calcular_aumento(odd_casa, odd_empate, odd_fora, tipo_odd_casa, tipo_odd_empate, tipo_odd_fora, valor_apostado, tipo_aposta):
@@ -59,14 +59,14 @@ def calcular_aumento(odd_casa, odd_empate, odd_fora, tipo_odd_casa, tipo_odd_emp
 
         lucro = retorno - total_investido
 
-        roi = 0 if total_investido == 0 else (lucro / total_investido) * 100
+        roi = (lucro / total_investido) * 100 if total_investido != 0 else 0
 
         return aposta_casa, aposta_empate, aposta_fora, retorno, total_investido, lucro, roi
 
     except ValueError:
         return None, None, None, None, None, None, None
 
-# Cálculo de aumento
+# Cálculo de super odd
 def calcular_superodd(odd_superodd, odd_cobertura, tipo_odd_superodd, tipo_odd_cobertura, valor_apostado, tipo_aposta):
     aumentos = {
     "Normal": 0.00,
@@ -91,19 +91,20 @@ def calcular_superodd(odd_superodd, odd_cobertura, tipo_odd_superodd, tipo_odd_c
 
         lucro = retorno - total_investido
 
-        roi = 0 if total_investido == 0 else (lucro / total_investido) * 100
+        roi = (lucro / total_investido) * 100 if total_investido != 0 else 0
 
         return aposta_superodd, aposta_cobertura, retorno, total_investido, lucro, roi
 
     except ValueError:
         return None, None, None, None, None, None
 
+# Layout Aumento
 if selected == "Aumento":
     st.subheader("Método: " + selected)
 
     # Layout dos inputs
     col_odd_casa, col_odd_empate, col_odd_fora, col_aposta = st.columns(4)
-    #Layout das odds
+    ## Layout das odds
     with col_odd_casa:
         odd_casa = st.number_input("Odd Casa", min_value=1.00, format="%.2f")
         tipo_odd_casa = st.selectbox("Aumento Casa", ["Normal", "Com 25%", "Com 30%", "Betbra (2,8%)", "Betbra (4,5%)"], key="odd_casa_tipo")
@@ -113,14 +114,14 @@ if selected == "Aumento":
     with col_odd_fora:
         odd_fora = st.number_input("Odd Fora", min_value=1.00, format="%.2f")
         tipo_odd_fora = st.selectbox("Aumento Fora", ["Normal", "Com 25%", "Com 30%", "Betbra (2,8%)", "Betbra (4,5%)"], key="odd_fora_tipo")
-    # Layout do valor apostado
+    ## Layout do valor apostado
     with col_aposta:
-        tipo_aposta = st.selectbox("Aposta Principal", ["Casa", "Empate", "Fora"])
-        valor_apostado = st.number_input("Valor Apostado", min_value=0.0, format="%.2f")
+        tipo_aposta_aumento = st.selectbox("Aposta Principal", ["Casa", "Empate", "Fora"])
+        valor_apostado_aumento = st.number_input("Valor Apostado", min_value=0.0, format="%.2f", key="valor_apostado_aumento")
 
     # Para calcular
     aposta_casa, aposta_empate, aposta_fora, retorno, total_investido, lucro, roi = calcular_aumento(
-        odd_casa, odd_empate, odd_fora, tipo_odd_casa, tipo_odd_empate, tipo_odd_fora, valor_apostado, tipo_aposta
+        odd_casa, odd_empate, odd_fora, tipo_odd_casa, tipo_odd_empate, tipo_odd_fora, valor_apostado_aumento, tipo_aposta_aumento
     )
 
     if None not in (aposta_casa, aposta_empate, aposta_fora, retorno, total_investido, lucro, roi):
@@ -147,57 +148,7 @@ if selected == "Aumento":
     else:
         st.error("Erro ao calcular os valores. Verifique os dados inseridos.")
 
-
-if selected == "Aumento com Lay":
-    st.subheader("Método: " + selected)
-
-    # Layout dos inputs
-    col_odd_casa, col_odd_empate, col_odd_fora, col_aposta = st.columns(4)
-    #Layout das odds
-    with col_odd_casa:
-        odd_casa = st.number_input("Odd Casa", min_value=1.00, format="%.2f")
-        tipo_odd_casa = st.selectbox("Aumento Casa", ["Normal", "Com 25%", "Com 30%", "Betbra (2,8%)", "Betbra (4,5%)"], key="odd_casa_tipo")
-    with col_odd_empate:
-        odd_empate = st.number_input("Odd Empate", min_value=1.00, format="%.2f")
-        tipo_odd_empate = st.selectbox("Aumento Empate", ["Normal", "Com 25%", "Com 30%", "Betbra (2,8%)", "Betbra (4,5%)"], key="odd_empate_tipo")
-    with col_odd_fora:
-        odd_fora = st.number_input("Odd Fora", min_value=1.00, format="%.2f")
-        tipo_odd_fora = st.selectbox("Aumento Fora", ["Normal", "Com 25%", "Com 30%", "Betbra (2,8%)", "Betbra (4,5%)"], key="odd_fora_tipo")
-    # Layout do valor apostado
-    with col_aposta:
-        tipo_aposta = st.selectbox("Aposta Principal", ["Casa", "Empate", "Fora"])
-        valor_apostado = st.number_input("Valor Apostado", min_value=0.0, format="%.2f")
-
-    # Para calcular
-    aposta_casa, aposta_empate, aposta_fora, retorno, total_investido, lucro, roi = calcular_aumento(
-        odd_casa, odd_empate, odd_fora, tipo_odd_casa, tipo_odd_empate, tipo_odd_fora, valor_apostado, tipo_aposta
-    )
-
-    if None not in (aposta_casa, aposta_empate, aposta_fora, retorno, total_investido, lucro, roi):
-        col_aposta_casa, col_aposta_empate, col_aposta_fora, col_retorno = st.columns(4)
-        with col_aposta_casa:
-            st.markdown(f"**Aposta Casa:** R$ {aposta_casa:.2f}")
-        with col_aposta_empate:
-            st.markdown(f"**Aposta Empate:** R$ {aposta_empate:.2f}")
-        with col_aposta_fora:
-            st.markdown(f"**Aposta Fora:** R$ {aposta_fora:.2f}")
-        with col_retorno:
-            st.markdown(f"**Retorno:** R$ {retorno:.2f}")
-        st.write("##")
-
-        col_total_investido, col_lucro, col_roi, col_branco = st.columns(4)
-        with col_total_investido:
-            st.markdown(f"**Total Investido:** R$ {total_investido:.2f}")
-        with col_lucro:
-            st.markdown(f"**Lucro Da Operação:** <span style='color: {'green' if lucro > 0 else 'red' if lucro < 0 else 'white'}'>R$ {lucro:.2f}</span>", unsafe_allow_html=True)
-        with col_roi:
-            st.markdown(f"**ROI:** <span style='color: {'green' if roi > 0 else 'red' if roi < 0 else 'white'}'> {roi:.2f} % </span>", unsafe_allow_html=True)
-        with col_branco:
-            st.markdown("")
-    else:
-        st.error("Erro ao calcular os valores. Verifique os dados inseridos.")
-
-
+#Layout Super Odd
 if selected == "Super Odd":
     st.subheader("Método: " + selected)
 
@@ -212,12 +163,12 @@ if selected == "Super Odd":
         tipo_odd_cobertura = st.selectbox("Aumento Casa", ["Normal", "Betbra (2,8%)", "Betbra (4,5%)", "Betbra (6,5%)"], key="odd_cobertura_tipo")
     # Layout do valor apostado
     with col_aposta:
-        tipo_aposta = st.selectbox("Aposta Principal", ["Super Odd", "Cobertura"])
-        valor_apostado = st.number_input("Valor Apostado", min_value=0.0, format="%.2f")
+        tipo_aposta_superodd = st.selectbox("Aposta Principal", ["Super Odd", "Cobertura"])
+        valor_apostado_superodd = st.number_input("Valor Apostado", min_value=0.0, format="%.2f", key="valor_apostado_superodd")
 
     # Para calcular
     aposta_superodd, aposta_cobertura, retorno, total_investido, lucro, roi = calcular_superodd(
-        odd_superodd, odd_cobertura, tipo_odd_superodd, tipo_odd_cobertura, valor_apostado, tipo_aposta
+        odd_superodd, odd_cobertura, tipo_odd_superodd, tipo_odd_cobertura, valor_apostado_superodd, tipo_aposta_superodd
     )
 
     if None not in (aposta_superodd, aposta_cobertura, retorno, total_investido, lucro, roi):
